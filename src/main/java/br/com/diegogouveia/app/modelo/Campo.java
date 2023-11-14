@@ -1,5 +1,7 @@
 package br.com.diegogouveia.app.modelo;
 
+import br.com.diegogouveia.app.exceptions.ExplosaoException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class Campo {
         }
     }
 
-    void alternarMarcacao(){
+    public void alternarMarcacao(){
         if(!aberto){
             marcado = !marcado;
         }
@@ -46,10 +48,23 @@ public class Campo {
             aberto = true;
 
             if(minado){
-
+            throw new ExplosaoException();
             }
+
+            if(vizinhacaSegura()){
+                vizinhos.forEach(v->v.abrir());
+            }
+            return true;
+        }else{
+            return false;
         }
-        return false;
     }
 
+    boolean vizinhacaSegura(){
+        return vizinhos.stream().noneMatch(v -> v.minado);
+    }
+
+    public boolean isMarcado(){
+        return marcado;
+    }
 }
