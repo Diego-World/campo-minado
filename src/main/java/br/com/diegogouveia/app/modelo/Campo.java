@@ -43,7 +43,7 @@ public class Campo {
         }
     }
 
-    boolean abrir(){
+    public boolean abrir(){
         if(!aberto && !marcado){
             aberto = true;
 
@@ -66,5 +66,61 @@ public class Campo {
 
     public boolean isMarcado(){
         return marcado;
+    }
+    public void minar(){
+        minado = true;
+    }
+    public boolean isMinado(){
+        return minado;
+    }
+    public boolean isAberto(){
+        return aberto;
+    }
+    public boolean isFechado(){
+        return !isAberto();
+    }
+
+    public int getLinha() {
+        return linha;
+    }
+
+    public int getColuna() {
+        return coluna;
+    }
+
+    boolean objeivoAlcancado(){
+        boolean desvendado = !minado && aberto;
+        boolean protegido = marcado && minado;
+        return desvendado || protegido;
+    }
+
+    long minasNaVizinhanca(){
+        return vizinhos.stream().filter(v -> v.minado).count();
+    }
+
+    void reiniciar(){
+        aberto = false;
+        minado = false;
+        marcado = false;
+    }
+
+    public String toString(){
+
+        String RESET = "\u001B[0m";
+        String RED = "\u001B[31m";
+        String GREEN = "\u001B[32m";
+        String YELLOW = "\u001B[33m";
+
+        if(marcado){
+            return "X";
+        }else if (aberto && minado){
+            return  "*";
+        }else if(aberto && minasNaVizinhanca() > 0){
+            return RED + minasNaVizinhanca() + RESET;
+        }else if(aberto){
+            return " ";
+        }else{
+            return "?";
+        }
     }
 }
