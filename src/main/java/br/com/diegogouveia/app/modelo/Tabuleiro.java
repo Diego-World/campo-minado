@@ -7,16 +7,16 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class Tabuleiro implements CampoObservador{
-    private final int linhas;
-    private final int colunas;
-    private final int minas;
+    private final int LINHAS;
+    private final int COLUNAS;
+    private final int MINAS;
     private final List<Campo> campos = new ArrayList<>();
     private List<Consumer<ResultadoEvento>> observadores = new ArrayList<>();
 
-    public Tabuleiro(int linhas, int colunas, int minas) {
-        this.linhas = linhas;
-        this.colunas = colunas;
-        this.minas = minas;
+    public Tabuleiro(int LINHAS, int COLUNAS, int MINAS) {
+        this.LINHAS = LINHAS;
+        this.COLUNAS = COLUNAS;
+        this.MINAS = MINAS;
 
         gerarCampos();
         associarVizinhos();
@@ -54,8 +54,8 @@ public class Tabuleiro implements CampoObservador{
     }
 
     private void gerarCampos() {
-        for (int linha = 0; linha < linhas; linha++) {
-            for (int coluna = 0; coluna < colunas; coluna++) {
+        for (int linha = 0; linha < LINHAS; linha++) {
+            for (int coluna = 0; coluna < COLUNAS; coluna++) {
                 Campo campo = new Campo(linha,coluna);
                 campo.registrarObservador(this);
                 campos.add(campo);
@@ -76,11 +76,11 @@ public class Tabuleiro implements CampoObservador{
             int aleatorio = (int) (Math.random() * campos.size());
             campos.get(aleatorio).minar();
             minasArmadas = campos.stream().filter(minado).count();
-        }while (minasArmadas < minas);
+        }while (minasArmadas < MINAS);
     }
 
     public int getMinas() {
-        return minas;
+        return MINAS;
     }
 
     public boolean objeivoAlcancado(){
@@ -103,11 +103,11 @@ public class Tabuleiro implements CampoObservador{
     }
 
     public int getLinhas() {
-        return linhas;
+        return LINHAS;
     }
 
     public int getColunas() {
-        return colunas;
+        return COLUNAS;
     }
     //Funcao que percorre todos os campos e possibilita uma função, na sua implementação uma lambda.
     //Recebendo o metodo add(). *Para entender a lógica acesse o uso*
