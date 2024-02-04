@@ -1,9 +1,9 @@
 package br.com.diegogouveia.app.modelo;
 
-import br.com.diegogouveia.app.exceptions.ExplosaoException;
-
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Campo {
     private boolean aberto;
@@ -12,9 +12,19 @@ public class Campo {
     private final int linha;
     private final int coluna;
     private List<Campo> vizinhos = new ArrayList<>();
+    private Set<CampoObservador> observadores = new LinkedHashSet<>(); // Estrutura Set usada com a função de não permitir repetição
     public Campo(int linha, int coluna) {
         this.linha = linha;
         this.coluna = coluna;
+    }
+
+    public void registrarObservador(CampoObservador observador){
+        observadores.add(observador);
+    }
+
+    private void notificarObservadores(CampoEvento evento){
+        observadores.stream()
+                .forEach(observador -> observador.eventoOcorreu(this,evento));
     }
 
     public boolean adicionarVizinho(Campo vizinho){
@@ -40,17 +50,23 @@ public class Campo {
     public void alternarMarcacao(){
         if(!aberto){
             marcado = !marcado;
+
+            if(marcado){
+                notificarObservadores(CampoEvento.MARCAR);
+            }else{
+                notificarObservadores(CampoEvento.DESMARCAR);
+            }
         }
     }
 
     public boolean abrir(){
         if(!aberto && !marcado){
-            aberto = true;
 
             if(minado){
-            throw new ExplosaoException();
+            notificarObservadores(CampoEvento.EXPLODIR);
+                return true;
             }
-
+            setAberto(true);
             if(vizinhacaSegura()){
                 vizinhos.forEach(v->v.abrir());
             }
@@ -70,6 +86,10 @@ public class Campo {
 
      void setAberto(boolean aberto) {
         this.aberto = aberto;
+
+        if(aberto){
+            notificarObservadores(CampoEvento.ABRIR);
+        }
     }
 
     public void minar(){
@@ -111,27 +131,4 @@ public class Campo {
         marcado = false;
     }
 
-    public String toString(){
-
-        String RESET = "\u001B[0m";
-        String RED = "\u001B[31m";
-        String GREEN = "\u001B[32m";
-        String YELLOW = "\u001B[33m";
-
-        if(marcado){
-            return "X";
-        }else if (aberto && minado){
-            return  "*";
-        }else if(aberto && minasNaVizinhanca() <= 1) {
-            return RED + minasNaVizinhanca() + RESET;
-        }else if(aberto && minasNaVizinhanca() == 2) {
-            return GREEN + minasNaVizinhanca() + RESET;
-        } else if (aberto && minasNaVizinhanca() == 3) {
-            return YELLOW + minasNaVizinhanca() + RESET;
-        }else if(aberto){
-            return " ";
-        }else{
-            return "?";
-        }
-    }
 }
